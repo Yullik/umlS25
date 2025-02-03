@@ -8,7 +8,7 @@ pipeline {
 
             steps {
 
-                    sleep 200 
+                    sleep 300 
 
                     echo 'Hello World'
 
