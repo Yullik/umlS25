@@ -5,17 +5,20 @@ pipeline {
     stages {
 
         stage("Hello") {
-
-            steps {
-
-                    sleep 300 
-
-                    echo 'Hello World'
-
+            when {
+                expression { env.BRANCH_NAME == 'main' } 
             }
-
+            steps {
+                    echo 'Hello World'
+            }
         }
-
+        stage('Wildcard Branch Check') {
+            when {
+                branch 'feature/*' 
+            }
+            steps {
+                echo "Running on a feature branch."
+            }
+        }
     }
-
 }
