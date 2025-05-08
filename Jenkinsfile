@@ -1,30 +1,35 @@
 pipeline {
-
     agent { label 'docker-agent' }
 
     stages {
-        // Hello stage for the main branch
-        stage("Hello") {
-            when {
-                expression { env.BRANCH_NAME == 'main' } 
-            }
+        stage('Checkout') {
             steps {
-                echo 'Hello World'
+                checkout scm
             }
         }
 
-        // Feature branch check
-        stage('Wildcard Branch Check') {
+        stage('Main Branch Tests') {
             when {
-                branch 'feature/*' 
+                expression { env.BRANCH_NAME == 'main' }
             }
             steps {
-                echo "Running on a feature branch."
+                echo 'Running tests and code coverage for main branch'
+                sh './gradlew test'
+                sh './gradlew jacocoTestReport'
             }
         }
 
-        // Default stage for other branches
-        stage('Unknown Branch') {
+        stage('Feature Branch Tests') {
+            when {
+                branch 'feature/*'
+            }
+            steps {
+                echo 'Running unit tests on feature branch'
+                sh './gradlew test'
+            }
+        }
+
+        stage('Other Branch Failure') {
             when {
                 not {
                     anyOf {
@@ -34,8 +39,8 @@ pipeline {
                 }
             }
             steps {
-                echo "Unknown branch, pipeline failed."
-                currentBuild.result = 'FAILURE'  // Marking the pipeline as failed
+                echo 'This is an unknown branch (other-branch), pipeline failed.'
+                currentBuild.result = 'FAILURE'
             }
         }
     }
@@ -43,9 +48,12 @@ pipeline {
     post {
         success {
             echo "Pipeline ran successfully"
+            archiveArtifacts '**/build/reports/jacoco/test/jacocoTestReport.xml'
+            archiveArtifacts '**/build/reports/jacoco/test/html/*.html'
         }
         failure {
             echo "Pipeline failed"
         }
     }
 }
+
