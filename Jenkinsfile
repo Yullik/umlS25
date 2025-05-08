@@ -14,8 +14,8 @@ pipeline {
             }
             steps {
                 echo 'Running tests and code coverage for main branch'
-                sh './gradlew test'
-                sh './gradlew jacocoTestReport'
+                sh './gradlew test'  // Run tests
+                sh './gradlew jacocoTestReport'  // Generate Jacoco report for code coverage
             }
         }
 
@@ -25,7 +25,7 @@ pipeline {
             }
             steps {
                 echo 'Running unit tests on feature branch'
-                sh './gradlew test'
+                sh './gradlew test'  // Run unit tests on feature branch
             }
         }
 
@@ -40,7 +40,6 @@ pipeline {
             }
             steps {
                 echo 'This is an unknown branch (other-branch), pipeline failed.'
-                currentBuild.result = 'FAILURE'
             }
         }
     }
@@ -48,11 +47,14 @@ pipeline {
     post {
         success {
             echo "Pipeline ran successfully"
-            archiveArtifacts '**/build/reports/jacoco/test/jacocoTestReport.xml'
-            archiveArtifacts '**/build/reports/jacoco/test/html/*.html'
+            archiveArtifacts '**/build/reports/jacoco/test/jacocoTestReport.xml'  // Archive Jacoco report
+            archiveArtifacts '**/build/reports/jacoco/test/html/*.html'  // Archive Jacoco HTML report
         }
         failure {
             echo "Pipeline failed"
+            script {
+                currentBuild.result = 'FAILURE'  // Set build result to FAILURE if pipeline fails
+            }
         }
     }
 }
