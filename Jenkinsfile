@@ -13,13 +13,9 @@ pipeline {
                 expression { env.BRANCH_NAME == 'main' }
             }
             steps {
-                script {
-                    if (fileExists('gradlew')) {
-                        sh 'chmod +x gradlew'
-                    }
-                    sh './gradlew test'
-                    sh './gradlew jacocoTestReport'
-                }
+                echo 'Running tests and code coverage for main branch'
+                sh 'gradle test'
+                sh 'gradle jacocoTestReport'
             }
         }
 
@@ -28,15 +24,8 @@ pipeline {
                 branch 'feature/*'
             }
             steps {
-                script {
-                    if (fileExists('gradlew')) {
-                        sh 'chmod +x gradlew'
-                        sh './gradlew test'
-                    } else {
-                        echo 'Gradle wrapper (gradlew) not found. Running tests with the system Gradle.'
-                        sh 'gradle test'
-                    }
-                }
+                echo 'Running unit tests on feature branch'
+                sh 'gradle test'
             }
         }
 
@@ -69,5 +58,4 @@ pipeline {
         }
     }
 }
-
 
