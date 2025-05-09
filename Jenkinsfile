@@ -14,8 +14,8 @@ pipeline {
             }
             steps {
                 echo 'Running tests and code coverage for main branch'
-                sh 'gradle test'
-                sh 'gradle jacocoTestReport'
+                sh './gradlew test'  // Run tests using gradlew wrapper
+                sh './gradlew jacocoTestReport'  // Generate Jacoco report for code coverage
             }
         }
 
@@ -25,7 +25,7 @@ pipeline {
             }
             steps {
                 echo 'Running unit tests on feature branch'
-                sh 'gradle test'
+                sh './gradlew test'  // Run unit tests on feature branch using gradlew wrapper
             }
         }
 
@@ -47,13 +47,13 @@ pipeline {
     post {
         success {
             echo "Pipeline ran successfully"
-            archiveArtifacts '**/build/reports/jacoco/test/jacocoTestReport.xml'
-            archiveArtifacts '**/build/reports/jacoco/test/html/*.html'
+            archiveArtifacts '**/build/reports/jacoco/test/jacocoTestReport.xml'  // Archive Jacoco report
+            archiveArtifacts '**/build/reports/jacoco/test/html/*.html'  // Archive Jacoco HTML report
         }
         failure {
             echo "Pipeline failed"
             script {
-                currentBuild.result = 'FAILURE'
+                currentBuild.result = 'FAILURE'  // Set build result to FAILURE if pipeline fails
             }
         }
     }
